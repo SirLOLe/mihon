@@ -515,7 +515,7 @@ class Downloader(
      */
     private fun compressToWebpIfNeeded(file: UniFile, filename: String) {
         val imageType = file.openInputStream().use { ImageUtil.findImageType(it) }
-        
+
         // If it's a GIF or HEIF/JXL that shouldn't be touched, just rename to its normal extension
         if (imageType == ImageUtil.ImageType.GIF) {
             file.renameTo("$filename.gif")
