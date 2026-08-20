@@ -487,7 +487,7 @@ class Downloader(
                         // Otherwise, start from scratch and overwrite the file.
                         stream = file.openOutputStream(it.code == 206),
                     )
-                    compressToWebpIfNeeded(file, filename)
+                    compressToWebpIfNeeded(file, tmpDir, filename)
                 }
             } catch (e: HttpException) {
                 if (e.code == 416) {
@@ -513,7 +513,7 @@ class Downloader(
      * Re-encodes the image file to WebP lossy (60% quality) to save maximum disk space (75-85%).
      * Keeps GIFs and existing animated/special files as-is.
      */
-    private fun compressToWebpIfNeeded(file: UniFile, filename: String) {
+    private fun compressToWebpIfNeeded(file: UniFile, tmpDir: UniFile, filename: String) {
         val imageType = file.openInputStream().use { ImageUtil.findImageType(it) }
 
         // If it's a GIF or HEIF/JXL that shouldn't be touched, just rename to its normal extension
@@ -531,7 +531,8 @@ class Downloader(
                     @Suppress("DEPRECATION")
                     Bitmap.CompressFormat.WEBP
                 }
-                val compressedTmp = file.parent?.createFile("$filename.compressed.tmp")
+                val compressedTmp = tmpDir.findFile("$filename.compressed.tmp")
+                    ?: tmpDir.createFile("$filename.compressed.tmp")
                 if (compressedTmp != null) {
                     compressedTmp.openOutputStream().use { out ->
                         bitmap.compress(format, 60, out)
@@ -571,7 +572,7 @@ class Downloader(
                 input.copyTo(output)
             }
         }
-        compressToWebpIfNeeded(tmpFile, filename)
+        compressToWebpIfNeeded(tmpFile, tmpDir, filename)
         cacheFile.delete()
         return tmpFile
     }
