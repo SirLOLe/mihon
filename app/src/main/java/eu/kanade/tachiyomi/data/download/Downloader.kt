@@ -510,7 +510,7 @@ class Downloader(
     }
 
     /**
-     * Re-encodes the image file to WebP lossy (75% quality) to save significant disk space (60-80%).
+     * Re-encodes the image file to WebP lossy (60% quality) to save maximum disk space (75-85%).
      * Keeps GIFs and existing animated/special files as-is.
      */
     private fun compressToWebpIfNeeded(file: UniFile, filename: String) {
@@ -534,7 +534,7 @@ class Downloader(
                 val compressedTmp = file.parent?.createFile("$filename.compressed.tmp")
                 if (compressedTmp != null) {
                     compressedTmp.openOutputStream().use { out ->
-                        bitmap.compress(format, 75, out)
+                        bitmap.compress(format, 60, out)
                     }
                     bitmap.recycle()
                     // If compression was successful and generated valid data
